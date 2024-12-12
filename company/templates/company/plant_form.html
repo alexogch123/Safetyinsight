@@ -1,0 +1,92 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            {% if obj %}
+                                Editar Planta
+                            {% else %}
+                                Nueva Planta
+                            {% endif %}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if form.errors %}
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h5><i class="icon fas fa-ban"></i> Error</h5>
+                            {{ form.errors }}
+                        </div>
+                        {% endif %}
+
+                        {% for field in form %}
+                        <div class="form-group row">
+                            <label for="{{ field.id_for_label }}" class="col-sm-3 col-form-label">
+                                {{ field.label }}{% if field.field.required %} *{% endif %}
+                            </label>
+                            <div class="col-sm-9">
+                                {{ field }}
+                                {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% if field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ field.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="row justify-content-end">
+                            <div class="col-sm-9">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> 
+                                    {% if obj %}
+                                        Actualizar
+                                    {% else %}
+                                        Guardar
+                                    {% endif %}
+                                </button>
+                                <a href="{% url 'company:plant_list' %}" class="btn btn-warning">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block js_page %}
+<script>
+    $(document).ready(function() {
+        // Asegurar que todos los campos tengan la clase form-control
+        $('input[type=text], input[type=email], select, textarea').addClass('form-control');
+        
+        // Inicializar select2 para los campos de selección
+        if($.fn.select2) {
+            $('#id_organization').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Seleccione una organización',
+                width: '100%'
+            });
+            
+            $('#id_address').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Seleccione una dirección',
+                width: '100%'
+            });
+        }
+    });
+</script>
+{% endblock %} 

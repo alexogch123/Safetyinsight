@@ -1,0 +1,107 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+<div class="card shadow mb-4">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Listado de Direcciones</h6>
+        <div class="dropdown no-arrow">
+            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                aria-labelledby="dropdownMenuLink">
+                <div class="dropdown-header">Acciones:</div>
+                <a href="{% url 'company:direction_new' %}" class="dropdown-item">
+                    <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Nueva Dirección
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Organización</th>
+                        <th>Calle</th>
+                        <th>Número</th>
+                        <th>Colonia</th>
+                        <th>Ciudad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in obj %}
+                    <tr>
+                        <td>{{ item.organization }}</td>
+                        <td>{{ item.calle }}</td>
+                        <td>{{ item.numero_exterior }}{% if item.numero_interior %} Int. {{ item.numero_interior }}{% endif %}</td>
+                        <td>{{ item.colonia }}</td>
+                        <td>{{ item.ciudad }}</td>
+                        <td>{{ item.estado }}</td>
+                        <td>
+                            {% if item.estado %}
+                            <a href="{% url 'company:direction_edit' item.id %}" 
+                               class="btn btn-warning btn-circle" 
+                               role="button"
+                               title="Editar">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            <button class="btn btn-danger btn-circle" 
+                                    onclick="showDeleteModal('{% url 'company:direction_delete' item.id %}')"
+                                    title="Eliminar">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea Eliminar esta Dirección?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <a id="confirmDelete" href="" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_page %}
+<script>
+    $(document).ready(function(){
+        $('#dataTable').DataTable();
+    });
+
+    function showDeleteModal(url) {
+        $('#confirmDelete').attr('href', url);
+        $('#deleteModal').modal('show');
+    }
+</script>
+{% endblock %} 

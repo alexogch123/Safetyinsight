@@ -1,0 +1,21 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+<form method="POST" class="form-inline">
+    {% csrf_token %}
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            ¿Eliminar {{ obj.name }}?</div>
+                        <button type="submit" class="btn btn-danger"><i class="far fa-question-circle"></i> Si, eliminar</button>
+                        <a href="{% url 'company:company_list' %}" class="btn btn-success"><i class="fas fa-undo"></i> Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock page_content %} 

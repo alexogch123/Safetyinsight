@@ -1,0 +1,199 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+<div class="card shadow mb-4">
+    <!-- Card Header -->
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Listado de Plantas</h6>
+        <div class="dropdown no-arrow">
+            <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                aria-labelledby="dropdownMenuLink">
+                <div class="dropdown-header">Acciones:</div>
+                <a class="dropdown-item" href="{% url 'company:plant_new' %}">
+                    <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Nueva Planta
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- Card Body -->
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Organización</th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in obj %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.organization }}</td>
+                        <td>{{ item.address }}</td>
+                        <td>
+                            {% if item.estado %}
+                                <span class="badge badge-success">Activo</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'company:plant_edit' item.id %}" 
+                               class="btn btn-warning btn-circle" 
+                               role="button"
+                               title="Editar">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            <button class="btn btn-danger btn-circle" 
+                                    onclick="showDeleteModal('{% url 'company:plant_delete' item.id %}')"
+                                    title="Eliminar">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No hay plantas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                    from django.shortcuts import render, get_object_or_404, redirect
+                    from .models import Company
+                    from django.urls import reverse_lazy
+                    from django.views.generic.edit import DeleteView
+                    
+                    class CompanyDeleteView(DeleteView):
+                        model = Company
+                        template_name = 'company/company_confirm_delete.html'
+                        success_url = reverse_lazy('company:company_list')
+                    
+                    # If you prefer a function-based view
+                    def company_delete(request, pk):
+                        company = get_object_or_404(Company, pk=pk)
+                        if request.method == 'POST':
+                            company.delete()
+                            return redirect('company:company_list')
+                        return render(request, 'company/company_confirm_delete.html', {'company': company})
+                    {% for item in obj %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.description }}</td>
+                        <td>{{ item.organization }}</td>
+                        <td>{{ item.address }}</td>
+                        <td>
+                            {% if item.estado %}
+                                <span class="badge badge-success">Activo</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'company:plant_edit' item.id %}" 
+                               class="btn btn-warning btn-circle" 
+                               role="button"
+                               title="Editar">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            <button class="btn btn-danger btn-circle" 
+                                    onclick="showDeleteModal('{% url 'company:plant_delete' item.id %}')"
+                                    title="Eliminar">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No hay plantas registradas.</td>
+                    </tr>
+                    {% endfor %}                    from django.urls import path
+                    from .views import company_list, company_create, company_edit
+                    
+                    app_name = 'company'
+                    
+                    urlpatterns = [
+                        path('', company_list, name='company_list'),
+                        path('new/', company_create, name='company_create'),
+                        path('edit/<int:pk>/', company_edit, name='company_edit'),
+                        # Remove or comment out the delete path if not needed
+                        # path('delete/<int:pk>/', company_delete, name='company_delete'),
+                    ]                    from django.urls import path
+                    from .views import company_list, company_create, company_edit, company_delete
+                    
+                    app_name = 'company'
+                    
+                    urlpatterns = [
+                        path('', company_list, name='company_list'),
+                        path('new/', company_create, name='company_create'),
+                        path('edit/<int:pk>/', company_edit, name='company_edit'),
+                        path('delete/<int:pk>/', company_delete, name='company_delete'),
+                    ]                    from django.urls import path
+                    from .views import company_list, company_create, company_edit
+                    
+                    app_name = 'company'
+                    
+                    urlpatterns = [
+                        path('', company_list, name='company_list'),
+                        path('new/', company_create, name='company_create'),
+                        path('edit/<int:pk>/', company_edit, name='company_edit'),
+                        # Remove or comment out the delete path if not needed
+                        # path('delete/<int:pk>/', company_delete, name='company_delete'),
+                    ]
+                </tbody>
+            </table>
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea Eliminar esta Planta?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <a id="confirmDelete" href="" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<tr>
+    <td colspan="6">No hay plantas registradas.</td>
+</tr>
+{% endfor %}          </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_page %}
+<script>
+    $(document).ready(function(){
+        $('#dataTable').DataTable();
+    });
+
+    function showDeleteModal(url) {
+        $('#confirmDelete').attr('href', url);
+        $('#deleteModal').modal('show');
+    }
+</script>
+{% endblock %} 
